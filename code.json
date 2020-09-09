@@ -1,0 +1,47 @@
+[
+  {
+    "name": "NGWMN Monitoring Locations ETL",
+    "organization": "U.S. Geological Survey",
+    "description": "Load monitoring locations into the NGWMN database",
+    "version": "0.0.1",
+    "status": "Development",
+
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://github.com/ACWI-SOGW/ngwmn_monitoring_locations_etl/blob/master/LICENSE.md"
+        }
+      ]
+    },
+
+    "homepageURL": "https://github.com/ACWI-SOGW/ngwmn_monitoring_locations_etl",
+    "downloadURL": "https://github.com/ACWI-SOGW/ngwmn_monitoring_locations_etl/archive/master.zip",
+    "disclaimerURL": "https://github.com/ACWI-SOGW/ngwmn_monitoring_locations_etl/blob/master/LICENSE.md",
+    "repositoryUrl": "https://github.com/ACWI-SOGW/ngwmn_monitoring_locations_etl.git",
+    "vcs": "git",
+
+    "laborHours": null,
+
+    "tags": [
+      "water data",
+      "U.S. Geological Survey",
+      "USGS",
+      "wma"
+    ],
+
+    "languages": [
+      "Python"
+    ],
+
+    "contact": {
+      "name": "Andrew Yan",
+      "email": "ayan@usgs.gov"
+    },
+
+    "date": {
+      "metadataLastUpdated": "2020-09-15"
+    }
+  }
+]
