@@ -1,6 +1,6 @@
 # ngwmn_monitoring_locations_etl
 [![Build Status](https://travis-ci.org/ACWI-SOGW/ngwmn_monitoring_locations_etl.svg?branch=master)](https://travis-ci.org/ACWI-SOGW/ngwmn_monitoring_locations_etl)
-
+[![codecov](https://codecov.io/gh/ACWI-SOGW/ngwmn_monitoring_locations_etl/branch/master/graph/badge.svg)](https://codecov.io/gh/ACWI-SOGW/ngwmn_monitoring_locations_etl)
 
 The following environment variables need to be provided to run the ETL:
 
