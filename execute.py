@@ -32,7 +32,7 @@ if __name__ == '__main__':
             load_monitoring_location(
                 database_user, database_password, f'{database_host}:{database_port}/{database_name}', transformed_data
             )
-        except cx_Oracle.IntegrityError:
+        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError):
             failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO']))
 
     if len(failed_locations) > 0:
