@@ -9,7 +9,7 @@ import cx_Oracle
 
 from etl.extract import get_monitoring_locations
 from etl.transform import transform_mon_loc_data
-from etl.load import load_monitoring_location
+from etl.load import load_monitoring_location, refresh_well_registry_mv
 
 
 registry_endpoint = os.getenv('REGISTRY_ML_ENDPOINT')
@@ -26,14 +26,16 @@ if __name__ == '__main__':
 
     mon_locs = get_monitoring_locations(registry_endpoint)
     failed_locations = []
+    connect_str = f'{database_host}:{database_port}/{database_name}'
     for mon_loc in mon_locs:
         transformed_data = transform_mon_loc_data(mon_loc)
         try:
             load_monitoring_location(
-                database_user, database_password, f'{database_host}:{database_port}/{database_name}', transformed_data
+                database_user, database_password, connect_str, transformed_data
             )
         except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError):
             failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO']))
+    refresh_well_registry_mv(database_user, database_password, connect_str)
 
     if len(failed_locations) > 0:
         warning_message = 'The following agency locations failed to insert/update:\n'

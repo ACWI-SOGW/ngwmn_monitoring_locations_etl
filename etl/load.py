@@ -67,3 +67,15 @@ def load_monitoring_location(db_user, db_password, connect_str, mon_loc):
         cursor = connect.cursor()
         cursor.execute(_generate_upsert_sql(mon_loc))
         connect.commit()
+
+
+def refresh_well_registry_mv(db_user, db_password, connect_str):
+    """
+    Refresh the well_registry_mv materialized view
+
+    """
+    with cx_Oracle.connect(
+        db_user, db_password, connect_str, encoding='UTF-8'
+    ) as connect:
+        cursor = connect.cursor()
+        cursor.execute("begin dbms_mview.refresh('GW_DATA_PORTAL.WELL_REGISTRY_MV'); end;")
