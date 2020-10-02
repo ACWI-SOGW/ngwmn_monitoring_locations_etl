@@ -1,7 +1,6 @@
 """
 Transform the data into a form that
 works with the WELL_REGISTRY_STG table.
-
 """
 
 
@@ -50,7 +49,6 @@ def transform_mon_loc_data(ml_data):
     Map the fields from the API JSON response to
     the fields in the WELL_REGISTRY_STG table with
     appropriate foreign key values.
-
     """
     mapped_data = dict()
 

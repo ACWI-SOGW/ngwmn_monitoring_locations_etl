@@ -1,6 +1,5 @@
 """
 Load data from the new Well Registry to NGWMN
-
 """
 import cx_Oracle
 from dateutil.parser import isoparse
@@ -10,7 +9,6 @@ def _manipulate_values(y):
     """
     Make various translations to make sure
     the data is Oracle friendly.
-
     """
     # remove leading and trailing spaces
     try:
@@ -40,7 +38,6 @@ def _manipulate_values(y):
 def _generate_upsert_sql(mon_loc):
     """
     Generate SQL to insert/update.
-
     """
     columns = ','.join(list(mon_loc.keys()))
     values = ','.join([_manipulate_values(x) for x in list(mon_loc.values())])
@@ -72,7 +69,6 @@ def load_monitoring_location(db_user, db_password, connect_str, mon_loc):
 def refresh_well_registry_mv(db_user, db_password, connect_str):
     """
     Refresh the well_registry_mv materialized view
-
     """
     with cx_Oracle.connect(
         db_user, db_password, connect_str, encoding='UTF-8'
