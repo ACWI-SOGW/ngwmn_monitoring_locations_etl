@@ -23,6 +23,8 @@ TEST_DATA = {
     'link': '',
     'local_aquifer_name': '',
     'nat_aqfr': {'nat_aqfr_cd': 'S100CSLLWD', 'nat_aqfr_desc': 'Coastal lowlands aquifer system'},
+    'insert_user': 'mickey.ca.gov',
+    'update_user': 'minnie.ca.gov',
     'qw_baseline_flag': False,
     'qw_network_name': '',
     'qw_sn_flag': False,

@@ -95,8 +95,8 @@ def transform_mon_loc_data(ml_data):
     mapped_data['UPDATE_DATE'] = ml_data['update_date']
     mapped_data['WL_WELL_PURPOSE_NOTES'] = ml_data['wl_well_purpose_notes']
     mapped_data['QW_WELL_PURPOSE_NOTES'] = ml_data['qw_well_purpose_notes']
-    mapped_data['INSERT_USER_ID'] = None
-    mapped_data['UPDATE_USER_ID'] = None
+    mapped_data['INSERT_USER_ID'] = ml_data['insert_user']
+    mapped_data['UPDATE_USER_ID'] = ml_data['update_user']
     mapped_data['WL_WELL_TYPE'] = map_well_type(ml_data['wl_well_type'])
     mapped_data['QW_WELL_TYPE'] = ml_data['qw_well_type']
     mapped_data['LOCAL_AQUIFER_CD'] = None
