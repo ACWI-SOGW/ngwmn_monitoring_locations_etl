@@ -16,4 +16,4 @@ class TestTransformMonitoringLocationData(TestCase):
     def test_transform(self):
         result = transform_mon_loc_data(self.test_data)
         self.assertEqual(len(result.items()), 53)
-        self.assertEqual(list(result.values()).count(None), 23)
+        self.assertEqual(list(result.values()).count(None), 21)

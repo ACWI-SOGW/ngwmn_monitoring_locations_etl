@@ -1,6 +1,5 @@
 """
 Tests for the extract.py module
-
 """
 from unittest import TestCase, mock
 

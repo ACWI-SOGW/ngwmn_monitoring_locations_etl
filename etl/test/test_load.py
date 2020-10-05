@@ -1,6 +1,5 @@
 """
 Tests for the load.py module
-
 """
 from unittest import TestCase, mock
 
