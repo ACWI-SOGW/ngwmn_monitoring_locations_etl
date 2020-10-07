@@ -20,21 +20,21 @@ database_password = os.getenv('DATABASE_PASSWORD')
 
 
 if __name__ == '__main__':
-    if database_user is None and database_password is None:
-        raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
+#    if database_user is None and database_password is None:
+#        raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
 
     mon_locs = get_monitoring_locations(registry_endpoint)
     failed_locations = []
     connect_str = f'{database_host}:{database_port}/{database_name}'
     for mon_loc in mon_locs:
         transformed_data = transform_mon_loc_data(mon_loc)
-        try:
-            load_monitoring_location(
-                database_user, database_password, connect_str, transformed_data
-            )
-        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError):
-            failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO']))
-    refresh_well_registry_mv(database_user, database_password, connect_str)
+#        try:
+#            load_monitoring_location(
+#                database_user, database_password, connect_str, transformed_data
+#            )
+#        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError):
+#            failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO']))
+#    refresh_well_registry_mv(database_user, database_password, connect_str)
 
     if len(failed_locations) > 0:
         warning_message = 'The following agency locations failed to insert/update:\n'
