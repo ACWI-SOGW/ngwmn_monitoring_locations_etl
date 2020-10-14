@@ -30,7 +30,7 @@ if __name__ == '__main__':
         transformed_data = transform_mon_loc_data(mon_loc)
         try:
             load_monitoring_location(
-               database_user, database_password, connect_str, transformed_data
+                database_user, database_password, connect_str, transformed_data
             )
         except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError):
             failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO']))
