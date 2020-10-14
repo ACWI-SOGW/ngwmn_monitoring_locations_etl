@@ -21,11 +21,11 @@ WL_WELL_TYPES = {
 }
 map_well_type = mapping_factory(WL_WELL_TYPES)
 
-WL_WELL_PURPOSE = {
+WELL_PURPOSE = {
     'dedicated monitoring/observation': 1,
     'other': 2
 }
-map_wl_well_purpose = mapping_factory(WL_WELL_PURPOSE)
+map_well_purpose = mapping_factory(WELL_PURPOSE)
 
 
 QW_WELL_CHARS = {
@@ -73,11 +73,11 @@ def transform_mon_loc_data(ml_data):
     mapped_data['QW_SN_FLAG'] = ml_data['qw_sn_flag']
     mapped_data['QW_BASELINE_FLAG'] = ml_data['qw_baseline_flag']
     mapped_data['QW_WELL_CHARS'] = map_qw_well_chars(ml_data['qw_well_chars'])
-    mapped_data['QW_WELL_PURPOSE'] = map_wl_well_purpose(ml_data['qw_well_purpose'])  # it's the same keys as WL_WELL_PURPOSE
+    mapped_data['QW_WELL_PURPOSE'] = map_well_purpose(ml_data['qw_well_purpose'])
     mapped_data['WL_SN_FLAG'] = ml_data['qw_sn_flag']
     mapped_data['WL_BASELINE_FLAG'] = ml_data['wl_baseline_flag']
     mapped_data['WL_WELL_CHARS'] = map_wl_well_chars(ml_data['wl_well_chars'])
-    mapped_data['WL_WELL_PURPOSE'] = map_wl_well_purpose(ml_data['wl_well_purpose'])
+    mapped_data['WL_WELL_PURPOSE'] = map_well_purpose(ml_data['wl_well_purpose'])
     mapped_data['DATA_PROVIDER'] = None
     mapped_data['QW_SYS_NAME'] = None
     mapped_data['WL_SYS_NAME'] = None
@@ -99,12 +99,18 @@ def transform_mon_loc_data(ml_data):
     mapped_data['QW_WELL_TYPE'] = ml_data['qw_well_type']
     mapped_data['LOCAL_AQUIFER_CD'] = None
     mapped_data['REVIEW_FLAG'] = None
-    mapped_data['STATE_CD'] = ml_data['state']['state_cd']
     try:
-        mapped_data['COUNTY_CD'] = ml_data.get('county', dict()).get('county_cd', None)
-    except AttributeError:
+        mapped_data['STATE_CD'] = ml_data['state']['state_cd']
+    except (AttributeError, KeyError, TypeError):
+        mapped_data['STATE_CD'] = None
+    try:
+        mapped_data['COUNTY_CD'] = ml_data.get['county']['county_cd']
+    except (AttributeError, KeyError, TypeError):
         mapped_data['COUNTY_CD'] = None
-    mapped_data['COUNTRY_CD'] = ml_data['country']['country_cd']
+    try:
+        mapped_data['COUNTRY_CD'] = ml_data['country']['country_cd']
+    except (AttributeError, KeyError, TypeError):
+        mapped_data['COUNTRY_CD'] = None
     mapped_data['WELL_DEPTH_UNITS'] = ml_data['well_depth_units']
     mapped_data['ALT_UNITS'] = ml_data['altitude_units']
     mapped_data['SITE_TYPE'] = ml_data['site_type']
