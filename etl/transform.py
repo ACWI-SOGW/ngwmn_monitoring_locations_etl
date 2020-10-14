@@ -104,7 +104,7 @@ def transform_mon_loc_data(ml_data):
     except (AttributeError, KeyError, TypeError):
         mapped_data['STATE_CD'] = None
     try:
-        mapped_data['COUNTY_CD'] = ml_data.get['county']['county_cd']
+        mapped_data['COUNTY_CD'] = ml_data['county']['county_cd']
     except (AttributeError, KeyError, TypeError):
         mapped_data['COUNTY_CD'] = None
     try:

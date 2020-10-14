@@ -15,7 +15,7 @@ def get_monitoring_locations(registry_ml_endpoint):
     with Session() as session:
         while next_chunk:
             print(f'Retrieving monitoring locations: {next_chunk}')
-            resp = session.get(next_chunk, timeout=10)
+            resp = session.get(next_chunk)
             payload = resp.json()
             results.extend(payload['results'])
             next_chunk = payload['next']
