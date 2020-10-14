@@ -10,7 +10,13 @@ from requests import Session
 
 class TestGetMonitoringLocations(TestCase):
     class MockResponse:
+        """
+        Mocks the requests get response
+        """
         def __init__(self, status_code):
+            """
+            Initialize MockResponse
+            """
             self.status_code = status_code
 
         def json(self):
