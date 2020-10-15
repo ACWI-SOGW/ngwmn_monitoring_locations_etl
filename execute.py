@@ -1,6 +1,8 @@
 """
 Execute the ETL from the new well registry to NGWMN
 """
+
+import logging
 import os
 import warnings
 
@@ -20,6 +22,8 @@ database_password = os.getenv('DATABASE_PASSWORD')
 
 
 if __name__ == '__main__':
+    logging.getLogger().setLevel(logging.INFO)
+
     if database_user is None and database_password is None:
         raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
 
