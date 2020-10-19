@@ -2,10 +2,9 @@
 Load data from the new Well Registry to NGWMN
 """
 import cx_Oracle
-from dateutil.parser import isoparse
 
 
-def _manipulate_values(y):
+def _manipulate_values(y, is_timestamp):
     """
     Make various translations to make sure
     the data is Oracle friendly.
@@ -15,13 +14,11 @@ def _manipulate_values(y):
         z = y.strip()
     except AttributeError:
         z = y
+
     # deal with datetimes
-    try:
-        isoparse(z)
-    except (ValueError, TypeError):
-        pass
-    else:
+    if is_timestamp:
         return f"to_timestamp('{z}', 'YYYY-MM-DD\"T\"HH24:MI:SS.ff6\"Z\"')"
+
     # deal with everything else
     if z is None:
         return 'NULL'
@@ -34,21 +31,23 @@ def _manipulate_values(y):
     else:
         return f"'{z}'"
 
+TIME_COLUMNS = ['INSERT_DATE', 'UPDATE_DATE']
+
 
 def _generate_upsert_sql(mon_loc):
     """
     Generate SQL to insert/update.
     """
-    columns = ','.join(list(mon_loc.keys()))
-    values = ','.join([_manipulate_values(x) for x in list(mon_loc.values())])
-    column_values = ','.join(
-        f"{k}={_manipulate_values(v)}" for k, v in mon_loc.items() if k not in ['AGENCY_CD', 'SITE_NO']
-    )
+    mon_loc_db =[(k, _manipulate_values(v, k in TIME_COLUMNS)) for k, v in mon_loc.items()]
+    all_columns = ','.join(col for (col, _) in mon_loc_db)
+    all_values = ','.join(value for (_, value) in mon_loc_db)
+    update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO'])
+
     statement = (
         f"MERGE INTO GW_DATA_PORTAL.WELL_REGISTRY_STG a "
         f"USING (SELECT '{mon_loc['AGENCY_CD']}' AGENCY_CD, '{mon_loc['SITE_NO']}' "
         f"SITE_NO FROM DUAL) b ON (a.AGENCY_CD = b.AGENCY_CD AND a.SITE_NO = b.SITE_NO) "
-        f"WHEN MATCHED THEN UPDATE SET {column_values} WHEN NOT MATCHED THEN INSERT ({columns}) VALUES ({values})"
+        f"WHEN MATCHED THEN UPDATE SET {update_query} WHEN NOT MATCHED THEN INSERT ({all_columns}) VALUES ({all_values})"
     )
     return statement
 

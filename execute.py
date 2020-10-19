@@ -36,8 +36,8 @@ if __name__ == '__main__':
             load_monitoring_location(
                 database_user, database_password, connect_str, transformed_data
             )
-        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError):
-            failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO']))
+        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError) as err:
+            failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
     refresh_well_registry_mv(database_user, database_password, connect_str)
 
     if len(failed_locations) > 0:
