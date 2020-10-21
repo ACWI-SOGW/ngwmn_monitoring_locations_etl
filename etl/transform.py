@@ -14,12 +14,12 @@ def mapping_factory(mapping):
     return map_func
 
 
-WL_WELL_TYPES = {
+WELL_TYPES = {
     'surveillance': 1,
     'trend': 2,
     'special': 3,
 }
-map_well_type = mapping_factory(WL_WELL_TYPES)
+map_well_type = mapping_factory(WELL_TYPES)
 
 WELL_PURPOSE = {
     'dedicated monitoring/observation': 1,
@@ -42,6 +42,9 @@ WL_WELL_CHARS = {
     'unknown': 999
 }
 map_wl_well_chars = mapping_factory(WL_WELL_CHARS)
+
+def to_flag(flag):
+    return '1' if flag else '0'
 
 
 def transform_mon_loc_data(ml_data):
@@ -70,19 +73,18 @@ def transform_mon_loc_data(ml_data):
         mapped_data['NAT_AQUIFER_CD'] = None
         mapped_data['NAT_AQFR_DESC'] = None
     mapped_data['LOCAL_AQUIFER_NAME'] = None
-    mapped_data['QW_SN_FLAG'] = ml_data['qw_sn_flag']
-    mapped_data['QW_BASELINE_FLAG'] = ml_data['qw_baseline_flag']
+    mapped_data['QW_SN_FLAG'] = to_flag(ml_data['qw_sn_flag'])
+    mapped_data['QW_BASELINE_FLAG'] = to_flag(ml_data['qw_baseline_flag'])
     mapped_data['QW_WELL_CHARS'] = map_qw_well_chars(ml_data['qw_well_chars'])
     mapped_data['QW_WELL_PURPOSE'] = map_well_purpose(ml_data['qw_well_purpose'])
-    mapped_data['WL_SN_FLAG'] = ml_data['qw_sn_flag']
-    mapped_data['WL_BASELINE_FLAG'] = ml_data['wl_baseline_flag']
+    mapped_data['WL_SN_FLAG'] = to_flag(ml_data['qw_sn_flag'])
+    mapped_data['WL_BASELINE_FLAG'] = to_flag(ml_data['wl_baseline_flag'])
     mapped_data['WL_WELL_CHARS'] = map_wl_well_chars(ml_data['wl_well_chars'])
     mapped_data['WL_WELL_PURPOSE'] = map_well_purpose(ml_data['wl_well_purpose'])
     mapped_data['DATA_PROVIDER'] = None
     mapped_data['QW_SYS_NAME'] = None
     mapped_data['WL_SYS_NAME'] = None
-    mapped_data['PK_SITEID'] = ml_data['id']
-    mapped_data['DISPLAY_FLAG'] = ml_data['display_flag']
+    mapped_data['DISPLAY_FLAG'] = to_flag(ml_data['display_flag'])
     mapped_data['WL_DATA_PROVIDER'] = None
     mapped_data['QW_DATA_PROVIDER'] = None
     mapped_data['LITH_DATA_PROVIDER'] = None
@@ -96,7 +98,7 @@ def transform_mon_loc_data(ml_data):
     mapped_data['INSERT_USER_ID'] = ml_data['insert_user']
     mapped_data['UPDATE_USER_ID'] = ml_data['update_user']
     mapped_data['WL_WELL_TYPE'] = map_well_type(ml_data['wl_well_type'])
-    mapped_data['QW_WELL_TYPE'] = ml_data['qw_well_type']
+    mapped_data['QW_WELL_TYPE'] = map_well_type(ml_data['qw_well_type'])
     mapped_data['LOCAL_AQUIFER_CD'] = None
     mapped_data['REVIEW_FLAG'] = None
     try:
@@ -111,8 +113,8 @@ def transform_mon_loc_data(ml_data):
         mapped_data['COUNTRY_CD'] = ml_data['country']['country_cd']
     except (AttributeError, KeyError, TypeError):
         mapped_data['COUNTRY_CD'] = None
-    mapped_data['WELL_DEPTH_UNITS'] = ml_data['well_depth_units']
-    mapped_data['ALT_UNITS'] = ml_data['altitude_units']
+    mapped_data['WELL_DEPTH_UNITS'] = ml_data['well_depth_units']['unit_id'] if ml_data['well_depth_units'] else None
+    mapped_data['ALT_UNITS'] = ml_data['altitude_units']['unit_id'] if ml_data['altitude_units'] else None
     mapped_data['SITE_TYPE'] = ml_data['site_type']
     mapped_data['AQFR_CHAR'] = None
     mapped_data['HORZ_METHOD'] = ml_data['horz_method']
