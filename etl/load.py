@@ -29,7 +29,11 @@ def _manipulate_values(y, is_timestamp):
     elif len(str(z)) == 0:
         return "''"
     else:
+        if isinstance(z, str):
+            # Escape single quotes
+            z = z.translate(str.maketrans({"'": "''"}))
         return f"'{z}'"
+
 
 TIME_COLUMNS = ['INSERT_DATE', 'UPDATE_DATE']
 
@@ -38,7 +42,7 @@ def _generate_upsert_sql(mon_loc):
     """
     Generate SQL to insert/update.
     """
-    mon_loc_db =[(k, _manipulate_values(v, k in TIME_COLUMNS)) for k, v in mon_loc.items()]
+    mon_loc_db = [(k, _manipulate_values(v, k in TIME_COLUMNS)) for k, v in mon_loc.items()]
     all_columns = ','.join(col for (col, _) in mon_loc_db)
     all_values = ','.join(value for (_, value) in mon_loc_db)
     update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO'])
