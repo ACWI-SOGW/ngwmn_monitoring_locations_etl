@@ -78,10 +78,12 @@ def transform_mon_loc_data(ml_data):
     mapped_data['QW_BASELINE_FLAG'] = to_flag(ml_data['qw_baseline_flag'])
     mapped_data['QW_WELL_CHARS'] = map_qw_well_chars(ml_data['qw_well_chars'])
     mapped_data['QW_WELL_PURPOSE'] = map_well_purpose(ml_data['qw_well_purpose'])
+    mapped_data['QW_NETWORK_NAME'] = ml_data['qw_network_name']
     mapped_data['WL_SN_FLAG'] = to_flag(ml_data['qw_sn_flag'])
     mapped_data['WL_BASELINE_FLAG'] = to_flag(ml_data['wl_baseline_flag'])
     mapped_data['WL_WELL_CHARS'] = map_wl_well_chars(ml_data['wl_well_chars'])
     mapped_data['WL_WELL_PURPOSE'] = map_well_purpose(ml_data['wl_well_purpose'])
+    mapped_data['WL_NETWORK_NAME'] = ml_data['wl_network_name']
     mapped_data['DATA_PROVIDER'] = None
     mapped_data['QW_SYS_NAME'] = None
     mapped_data['WL_SYS_NAME'] = None
