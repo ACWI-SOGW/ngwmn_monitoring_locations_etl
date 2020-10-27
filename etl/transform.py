@@ -15,31 +15,31 @@ def mapping_factory(mapping):
 
 
 WELL_TYPES = {
-    'surveillance': 1,
-    'trend': 2,
-    'special': 3,
+    'Surveillance': 1,
+    'Trend': 2,
+    'Special': 3,
 }
 map_well_type = mapping_factory(WELL_TYPES)
 
 WELL_PURPOSE = {
-    'dedicated monitoring/observation': 1,
-    'other': 2
+    'Dedicated Monitoring/Observation': 1,
+    'Other': 2
 }
 map_well_purpose = mapping_factory(WELL_PURPOSE)
 
 
 QW_WELL_CHARS = {
-    'background': 1,
-    'suspected / anticipated changes': 2,
-    'known changes': 3
+    'Background': 1,
+    'Suspected/Anticipated Changes': 2,
+    'Known Changes': 3
 }
 map_qw_well_chars = mapping_factory(QW_WELL_CHARS)
 
 WL_WELL_CHARS = {
-    'background': 1,
-    'suspected / anticipated changes': 2,
-    'known changes': 3,
-    'unknown': 999
+    'Background': 1,
+    'Suspected/Anticipated Changes': 2,
+    'Known Changes': 3,
+    'Unknown': 999
 }
 map_wl_well_chars = mapping_factory(WL_WELL_CHARS)
 
@@ -72,7 +72,7 @@ def transform_mon_loc_data(ml_data):
     except (AttributeError, KeyError, TypeError):
         mapped_data['NAT_AQUIFER_CD'] = None
         mapped_data['NAT_AQFR_DESC'] = None
-    mapped_data['LOCAL_AQUIFER_NAME'] = None
+    mapped_data['LOCAL_AQUIFER_NAME'] = ml_data['local_aquifer_name']
     mapped_data['QW_SN_FLAG'] = to_flag(ml_data['qw_sn_flag'])
     mapped_data['QW_BASELINE_FLAG'] = to_flag(ml_data['qw_baseline_flag'])
     mapped_data['QW_WELL_CHARS'] = map_qw_well_chars(ml_data['qw_well_chars'])
