@@ -15,31 +15,31 @@ def mapping_factory(mapping):
 
 
 WELL_TYPES = {
-    'Surveillance': 1,
-    'Trend': 2,
-    'Special': 3,
+    'surveillance': 1,
+    'trend': 2,
+    'special': 3,
 }
 map_well_type = mapping_factory(WELL_TYPES)
 
 WELL_PURPOSE = {
-    'Dedicated Monitoring/Observation': 1,
-    'Other': 2
+    'dedicated monitoring/observation': 1,
+    'other': 2
 }
 map_well_purpose = mapping_factory(WELL_PURPOSE)
 
 
 QW_WELL_CHARS = {
-    'Background': 1,
-    'Suspected/Anticipated Changes': 2,
-    'Known Changes': 3
+    'background': 1,
+    'suspected/anticipated changes': 2,
+    'known changes': 3
 }
 map_qw_well_chars = mapping_factory(QW_WELL_CHARS)
 
 WL_WELL_CHARS = {
-    'Background': 1,
-    'Suspected/Anticipated Changes': 2,
-    'Known Changes': 3,
-    'Unknown': 999
+    'background': 1,
+    'suspected/anticipated changes': 2,
+    'known changes': 3,
+    'unknown': 999
 }
 map_wl_well_chars = mapping_factory(WL_WELL_CHARS)
 
