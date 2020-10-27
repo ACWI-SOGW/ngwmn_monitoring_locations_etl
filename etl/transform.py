@@ -73,6 +73,7 @@ def transform_mon_loc_data(ml_data):
         mapped_data['NAT_AQUIFER_CD'] = None
         mapped_data['NAT_AQFR_DESC'] = None
     mapped_data['LOCAL_AQUIFER_NAME'] = ml_data['local_aquifer_name']
+    mapped_data['AQFR_CHAR'] = ml_data['aqfr_type']
     mapped_data['QW_SN_FLAG'] = to_flag(ml_data['qw_sn_flag'])
     mapped_data['QW_BASELINE_FLAG'] = to_flag(ml_data['qw_baseline_flag'])
     mapped_data['QW_WELL_CHARS'] = map_qw_well_chars(ml_data['qw_well_chars'])
