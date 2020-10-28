@@ -85,8 +85,6 @@ def transform_mon_loc_data(ml_data):
     mapped_data['WL_WELL_PURPOSE'] = map_well_purpose(ml_data['wl_well_purpose'])
     mapped_data['WL_SYS_NAME'] = ml_data['wl_network_name']
     mapped_data['DATA_PROVIDER'] = None
-    mapped_data['QW_SYS_NAME'] = None
-    mapped_data['WL_SYS_NAME'] = None
     mapped_data['DISPLAY_FLAG'] = to_flag(ml_data['display_flag'])
     mapped_data['WL_DATA_PROVIDER'] = None
     mapped_data['QW_DATA_PROVIDER'] = None
