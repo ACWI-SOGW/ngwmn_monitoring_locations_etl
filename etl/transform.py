@@ -117,7 +117,6 @@ def transform_mon_loc_data(ml_data):
     mapped_data['WELL_DEPTH_UNITS'] = ml_data['well_depth_units']['unit_id'] if ml_data['well_depth_units'] else None
     mapped_data['ALT_UNITS'] = ml_data['altitude_units']['unit_id'] if ml_data['altitude_units'] else None
     mapped_data['SITE_TYPE'] = ml_data['site_type']
-    mapped_data['AQFR_CHAR'] = None
     mapped_data['HORZ_METHOD'] = ml_data['horz_method']
     mapped_data['HORZ_ACY'] = ml_data['horz_acy']
     mapped_data['ALT_METHOD'] = ml_data['alt_method']
