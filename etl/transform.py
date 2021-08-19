@@ -43,6 +43,7 @@ WL_WELL_CHARS = {
 }
 map_wl_well_chars = mapping_factory(WL_WELL_CHARS)
 
+
 def to_flag(flag):
     return '1' if flag else '0'
 
