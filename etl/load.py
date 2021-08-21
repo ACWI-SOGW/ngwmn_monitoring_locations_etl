@@ -70,29 +70,10 @@ def _generate_upsert_pgsql(mon_loc):
     update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO'])
 
     statement = (
-        f"INSERT INTO GW_DATA_PORTAL.WELL_REGISTRY_MAIN a ({all_columns}) VALUES ({all_values}) "
+        f"INSERT INTO GW_DATA_PORTAL.WELL_REGISTRY_MAIN ({all_columns}) VALUES ({all_values}) "
         f"ON CONFLICT(agency_cd, site_no) DO UPDATE SET {update_query}"
     )
     return statement
-
-    # TODO delete this sample UPSERT when all is reviewed for merge, it might help the reviewer
-    # INSERT INTO PRODUCT(product_name, product_type, unit_price, modified_date)
-    #   SELECT   src.product_name,
-    #          src.product_type,
-    #          src.unit_price,
-    #          now() modified_date
-    #   FROM ( SELECT
-    #                 product_name,
-    #             product_type,
-    #             unit_price
-    #             FROM PRODUCT_DELTA
-    #   ) src
-    #
-    # ON CONFLICT(product_name, product_type)
-    # DO UPDATE
-    #        SET
-    #          unit_price   = excluded.unit_price,
-    #          modified_date = excluded.modified_date;
 
 
 def load_monitoring_location(db_user, db_password, connect_str, mon_loc):
