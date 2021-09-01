@@ -63,11 +63,11 @@ def _generate_upsert_pgsql(mon_loc):
     Generate SQL to insert/update for PostGIS
     """
     mon_loc_db = [(k, _manipulate_values(v, k in TIME_COLUMNS)) for k, v in mon_loc.items()]
-    all_columns = ','.join(col for (col, _) in mon_loc_db)
+    all_columns = ','.join(col for (col, _) in mon_loc_db if col not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
     all_columns += ',geom'
-    all_values = ','.join(value for (_, value) in mon_loc_db)
+    all_values = ','.join(value for (key, value) in mon_loc_db if key not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
     all_values += f", ST_MakePoint({mon_loc['DEC_LAT_VA']},{mon_loc['DEC_LONG_VA']})"
-    update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO'])
+    update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO', 'INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
 
     statement = (
         f"INSERT INTO GW_DATA_PORTAL.WELL_REGISTRY_MAIN ({all_columns}) VALUES ({all_values}) "
@@ -89,12 +89,16 @@ def load_monitoring_location(db_user, db_password, connect_str, mon_loc):
         connect.commit()
 
 
-def load_monitoring_location_pg(db_user, db_password, host, mon_loc):
+def load_monitoring_location_pg(db_name, db_user, db_password, db_host, mon_loc):
     """
     Connect to the database and run the upsert SQL into PostGIS.
     """
     with psycopg2.connect(
-            f"dbname='ngwmn' user='{db_user}' host='{host}' password='{db_password}'"
+            user="ngwmn_owner",
+            password="lqb",
+            host="127.0.0.1",
+            port="5432",
+            database="ngwmn"
     ) as connect:
         cursor = connect.cursor()
         cursor.execute(_generate_upsert_pgsql(mon_loc))

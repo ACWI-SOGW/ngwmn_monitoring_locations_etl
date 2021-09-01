@@ -13,14 +13,15 @@ from etl.extract import get_monitoring_locations
 from etl.transform import transform_mon_loc_data
 from etl.load import load_monitoring_location, load_monitoring_location_pg, refresh_well_registry_mv
 
+from etl.test.real_data import real_data
 
 registry_endpoint = os.getenv('REGISTRY_ML_ENDPOINT')
-database_host = os.getenv('DATABASE_HOST')
+database_host = os.getenv('DATABASE_HOST', None)
 database_name = os.getenv('DATABASE_NAME')
 database_port = os.getenv('DATABASE_PORT')
 database_user = os.getenv('DATABASE_USER')
 database_password = os.getenv('DATABASE_PASSWORD')
-pg_host = os.getenv('PG_HOST')
+pg_host = os.getenv('PG_HOST', None)
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
@@ -28,25 +29,32 @@ if __name__ == '__main__':
     if database_user is None and database_password is None:
         raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
 
-    mon_locs = get_monitoring_locations(registry_endpoint)
+#    mon_locs = get_monitoring_locations(registry_endpoint)
+    mon_locs = real_data
     failed_locations = []
     connect_str = f'{database_host}:{database_port}/{database_name}'
     for mon_loc in mon_locs:
         transformed_data = transform_mon_loc_data(mon_loc)
-        try:  # ETL to legacy Oracle
-            load_monitoring_location(
-                database_user, database_password, connect_str, transformed_data
-            )
-        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError) as err:
-            failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
 
-        try:  # ETL to PostGIS
-            load_monitoring_location_pg(
-                database_user, database_password, pg_host, transformed_data
-            )
-        except (psycopg2.IntegrityError, psycopg2.DatabaseError) as err:
-            failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
-    refresh_well_registry_mv(database_user, database_password, connect_str)
+        if database_host is not None:
+            try:  # ETL to legacy Oracle
+                load_monitoring_location(
+                    database_user, database_password, connect_str, transformed_data
+                )
+            except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError) as err:
+                failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
+
+        if pg_host is not None:
+            try:  # ETL to PostGIS
+                load_monitoring_location_pg(database_name,
+                    database_user, database_password, pg_host, transformed_data
+                )
+            except (psycopg2.IntegrityError, psycopg2.DatabaseError) as err:
+                failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
+                raise err
+
+    if database_host is not None:
+        refresh_well_registry_mv(database_user, database_password, connect_str)
 
     if len(failed_locations) > 0:
         warning_message = 'The following agency locations failed to insert/update:\n'
