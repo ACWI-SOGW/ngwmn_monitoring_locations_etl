@@ -54,12 +54,25 @@ if __name__ == '__main__':
                 raise err
 
     if database_host is not None:
-        refresh_well_registry_mv(database_user, database_password, connect_str)
+        try:  # ETL to legacy Oracle
+            refresh_well_registry_mv(database_user, database_password, connect_str)
+            oracle_update = True
+        except (cx_Oracle.IntegrityError, cx_Oracle.DatabaseError) as err:
+            oracle_update = False
+
     if pg_host is not None:
-        refresh_well_registry_pg(pg_host, database_name, database_user, database_password)
+        try:  # ETL to PostGIS
+            refresh_well_registry_pg(pg_host, database_name, database_user, database_password)
+            postgres_update = True
+        except (psycopg2.IntegrityError, psycopg2.DatabaseError) as err:
+            postgres_update = False
 
     if len(failed_locations) > 0:
         warning_message = 'The following agency locations failed to insert/update:\n'
         for failed_location in failed_locations:
             warning_message += f'\t{failed_location}\n'
+        if not oracle_update:
+            warning_message += "\n Oracle View Not Updated.\n"
+        if not postgres_update:
+            warning_message += "\n Postgres View Not Updated.\n"
         warnings.warn(warning_message)
