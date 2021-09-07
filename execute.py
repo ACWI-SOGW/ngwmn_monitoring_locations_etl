@@ -11,7 +11,8 @@ import psycopg2
 
 from etl.extract import get_monitoring_locations
 from etl.transform import transform_mon_loc_data, date_format
-from etl.load import load_monitoring_location, load_monitoring_location_pg, refresh_well_registry_mv
+from etl.load import load_monitoring_location, load_monitoring_location_pg, \
+    refresh_well_registry_mv, refresh_well_registry_pg
 
 from etl.test.real_data import real_data
 
@@ -54,6 +55,8 @@ if __name__ == '__main__':
 
     if database_host is not None:
         refresh_well_registry_mv(database_user, database_password, connect_str)
+    if pg_host is not None:
+        refresh_well_registry_pg(pg_host, database_name, database_user, database_password)
 
     if len(failed_locations) > 0:
         warning_message = 'The following agency locations failed to insert/update:\n'

@@ -114,3 +114,159 @@ def refresh_well_registry_mv(db_user, db_password, connect_str):
     ) as connect:
         cursor = connect.cursor()
         cursor.execute("begin dbms_mview.refresh('GW_DATA_PORTAL.WELL_REGISTRY_MV'); end;")
+
+
+def refresh_well_registry_pg(db_host, db_name, db_user, db_password):
+    with psycopg2.connect(
+            user="ngwmn_owner",
+            password="lqb",
+            host="127.0.0.1",
+            port="5432",
+            database="ngwmn"
+    ) as connect:
+        cursor = connect.cursor()
+        cursor.execute(DELETE_MV)
+        cursor.execute(INSERT_MV)
+        connect.commit()
+
+
+DELETE_MV = 'delete from gw_data_portal.well_registry_mv;'
+INSERT_MV = 'insert into gw_data_portal.well_registry_mv ( \
+              AGENCY_CD, \
+              AGENCY_NM, \
+              AGENCY_MED, \
+              SITE_NO, \
+              SITE_NAME, \
+              DISPLAY_FLAG, \
+              DEC_LAT_VA, \
+              DEC_LONG_VA, \
+              HORZ_DATUM, \
+              HORZ_METHOD, \
+              HORZ_ACY, \
+              ALT_VA, \
+              ALT_UNITS, \
+              ALT_UNITS_NM, \
+              ALT_DATUM_CD, \
+              ALT_METHOD, \
+              ALT_ACY, \
+              WELL_DEPTH, \
+              WELL_DEPTH_UNITS, \
+              WELL_DEPTH_UNITS_NM, \
+              NAT_AQUIFER_CD, \
+              NAT_AQFR_DESC, \
+              COUNTRY_CD, \
+              COUNTRY_NM, \
+              STATE_CD, \
+              STATE_NM, \
+              COUNTY_CD, \
+              COUNTY_NM, \
+              LOCAL_AQUIFER_CD, \
+              LOCAL_AQUIFER_NAME, \
+              SITE_TYPE, \
+              AQFR_CHAR, \
+              QW_SYS_NAME, \
+              QW_SN_FLAG, \
+              QW_SN_DESC, \
+              QW_BASELINE_FLAG, \
+              QW_BASELINE_DESC, \
+              QW_WELL_CHARS, \
+              QW_WELL_CHARS_DESC, \
+              QW_WELL_TYPE, \
+              QW_WELL_TYPE_DESC, \
+              QW_WELL_PURPOSE, \
+              QW_WELL_PURPOSE_DESC, \
+              QW_WELL_PURPOSE_NOTES, \
+              WL_SYS_NAME, \
+              WL_SN_FLAG, \
+              WL_SN_DESC, \
+              WL_BASELINE_FLAG, \
+              WL_BASELINE_DESC, \
+              WL_WELL_CHARS, \
+              WL_WELL_CHARS_DESC, \
+              WL_WELL_TYPE, \
+              WL_WELL_TYPE_DESC, \
+              WL_WELL_PURPOSE, \
+              WL_WELL_PURPOSE_DESC, \
+              WL_WELL_PURPOSE_NOTES, \
+              GEOM, \
+              INSERT_DATE, \
+              UPDATE_DATE, \
+              DATA_PROVIDER, \
+              WL_DATA_PROVIDER, \
+              QW_DATA_PROVIDER, \
+              LITH_DATA_PROVIDER, \
+              CONST_DATA_PROVIDER, \
+              WL_DATA_FLAG, \
+              QW_DATA_FLAG, \
+              LOG_DATA_FLAG, \
+              LINK \
+  ) \
+  select      AGENCY_CD, \
+              AGENCY_NM, \
+              AGENCY_MED, \
+              SITE_NO, \
+              SITE_NAME, \
+              DISPLAY_FLAG, \
+              DEC_LAT_VA, \
+              DEC_LONG_VA, \
+              HORZ_DATUM, \
+              HORZ_METHOD, \
+              HORZ_ACY, \
+              ALT_VA, \
+              ALT_UNITS, \
+              ALT_UNITS_NM, \
+              ALT_DATUM_CD, \
+              ALT_METHOD, \
+              ALT_ACY, \
+              WELL_DEPTH, \
+              WELL_DEPTH_UNITS, \
+              WELL_DEPTH_UNITS_NM, \
+              NAT_AQUIFER_CD, \
+              NAT_AQFR_DESC, \
+              COUNTRY_CD, \
+              COUNTRY_NM, \
+              STATE_CD, \
+              STATE_NM, \
+              COUNTY_CD, \
+              COUNTY_NM, \
+              LOCAL_AQUIFER_CD, \
+              LOCAL_AQUIFER_NAME, \
+              SITE_TYPE, \
+              AQFR_CHAR, \
+              QW_SYS_NAME, \
+              QW_SN_FLAG, \
+              QW_SN_DESC, \
+              QW_BASELINE_FLAG, \
+              QW_BASELINE_DESC, \
+              QW_WELL_CHARS, \
+              QW_WELL_CHARS_DESC, \
+              QW_WELL_TYPE, \
+              QW_WELL_TYPE_DESC, \
+              QW_WELL_PURPOSE, \
+              QW_WELL_PURPOSE_DESC, \
+              QW_WELL_PURPOSE_NOTES, \
+              WL_SYS_NAME, \
+              WL_SN_FLAG, \
+              WL_SN_DESC, \
+              WL_BASELINE_FLAG, \
+              WL_BASELINE_DESC, \
+              WL_WELL_CHARS, \
+              WL_WELL_CHARS_DESC, \
+              WL_WELL_TYPE, \
+              WL_WELL_TYPE_DESC, \
+              WL_WELL_PURPOSE, \
+              WL_WELL_PURPOSE_DESC, \
+              WL_WELL_PURPOSE_NOTES, \
+              GEOM, \
+              INSERT_DATE, \
+              UPDATE_DATE, \
+              DATA_PROVIDER, \
+              WL_DATA_PROVIDER, \
+              QW_DATA_PROVIDER, \
+              LITH_DATA_PROVIDER, \
+              CONST_DATA_PROVIDER, \
+              WL_DATA_FLAG, \
+              QW_DATA_FLAG, \
+              LOG_DATA_FLAG, \
+              LINK \
+  from gw_data_portal.well_registry wr;'
