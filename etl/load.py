@@ -94,11 +94,11 @@ def load_monitoring_location_pg(db_host, db_name, db_user, db_password, mon_loc)
     Connect to the database and run the upsert SQL into PostGIS.
     """
     with psycopg2.connect(
-            user="ngwmn_owner",
-            password="lqb",
-            host="127.0.0.1",
+            host=db_host,
             port="5432",
-            database="ngwmn"
+            database=db_name,
+            user=db_user,
+            password=db_password
     ) as connect:
         cursor = connect.cursor()
         cursor.execute(_generate_upsert_pgsql(mon_loc))
@@ -118,11 +118,11 @@ def refresh_well_registry_mv(db_user, db_password, connect_str):
 
 def refresh_well_registry_pg(db_host, db_name, db_user, db_password):
     with psycopg2.connect(
-            user="ngwmn_owner",
-            password="lqb",
-            host="127.0.0.1",
+            host=db_host,
             port="5432",
-            database="ngwmn"
+            database=db_name,
+            user=db_user,
+            password=db_password
     ) as connect:
         cursor = connect.cursor()
         cursor.execute(DELETE_MV)
