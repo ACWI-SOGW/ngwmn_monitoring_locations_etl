@@ -10,7 +10,7 @@ import cx_Oracle
 import psycopg2
 
 from etl.extract import get_monitoring_locations
-from etl.transform import transform_mon_loc_data
+from etl.transform import transform_mon_loc_data, date_format
 from etl.load import load_monitoring_location, load_monitoring_location_pg, refresh_well_registry_mv
 
 from etl.test.real_data import real_data
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     if database_user is None and database_password is None:
         raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
 
-#    mon_locs = get_monitoring_locations(registry_endpoint)
+    #    mon_locs = get_monitoring_locations(registry_endpoint)
     mon_locs = real_data
     failed_locations = []
     connect_str = f'{database_host}:{database_port}/{database_name}'
@@ -46,9 +46,8 @@ if __name__ == '__main__':
 
         if pg_host is not None:
             try:  # ETL to PostGIS
-                load_monitoring_location_pg(database_name,
-                    database_user, database_password, pg_host, transformed_data
-                )
+                date_format(transformed_data)
+                load_monitoring_location_pg(pg_host, database_name, database_user, database_password, transformed_data)
             except (psycopg2.IntegrityError, psycopg2.DatabaseError) as err:
                 failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
                 raise err

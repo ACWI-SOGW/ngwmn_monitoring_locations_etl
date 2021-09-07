@@ -2,6 +2,7 @@
 Transform the data into a form that
 works with the WELL_REGISTRY_STG table.
 """
+import re
 
 
 def mapping_factory(mapping):
@@ -124,3 +125,11 @@ def transform_mon_loc_data(ml_data):
     mapped_data['ALT_ACY'] = ml_data['alt_acy']
 
     return mapped_data
+
+
+def date_format(mapped_data):
+    # fix missing fractions of a second
+    if re.match(r".*:\d\dZ$", mapped_data['INSERT_DATE']):
+        mapped_data['INSERT_DATE'] = mapped_data['INSERT_DATE'][:-1] + ".0Z"
+    if re.match(r".*:\d\dZ$", mapped_data['UPDATE_DATE']):
+        mapped_data['UPDATE_DATE'] = mapped_data['UPDATE_DATE'][:-1] + ".0Z"

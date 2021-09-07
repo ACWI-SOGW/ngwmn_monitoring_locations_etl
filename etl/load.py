@@ -89,7 +89,7 @@ def load_monitoring_location(db_user, db_password, connect_str, mon_loc):
         connect.commit()
 
 
-def load_monitoring_location_pg(db_name, db_user, db_password, db_host, mon_loc):
+def load_monitoring_location_pg(db_host, db_name, db_user, db_password, mon_loc):
     """
     Connect to the database and run the upsert SQL into PostGIS.
     """
