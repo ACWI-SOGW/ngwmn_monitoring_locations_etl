@@ -51,7 +51,6 @@ if __name__ == '__main__':
                 load_monitoring_location_pg(pg_host, database_name, database_user, database_password, transformed_data)
             except (psycopg2.IntegrityError, psycopg2.DatabaseError) as err:
                 failed_locations.append((transformed_data['AGENCY_CD'], transformed_data['SITE_NO'], err))
-                raise err
 
     if database_host is not None:
         try:  # ETL to legacy Oracle
@@ -72,7 +71,7 @@ if __name__ == '__main__':
         for failed_location in failed_locations:
             warning_message += f'\t{failed_location}\n'
         if not oracle_update:
-            warning_message += "\n Oracle View Not Updated.\n"
+            warning_message += "\n Oracle Well_Registry_MV Not Updated.\n"
         if not postgres_update:
-            warning_message += "\n Postgres View Not Updated.\n"
+            warning_message += "\n Postgres Well_Registry_MV Not Updated.\n"
         warnings.warn(warning_message)
