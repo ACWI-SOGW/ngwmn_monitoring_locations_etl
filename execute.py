@@ -14,8 +14,6 @@ from etl.transform import transform_mon_loc_data, date_format
 from etl.load import load_monitoring_location, load_monitoring_location_pg, \
     refresh_well_registry_mv, refresh_well_registry_pg, make_oracle, make_postgres
 
-from etl.test.real_data import real_data
-
 registry_endpoint = os.getenv('REGISTRY_ML_ENDPOINT')
 database_host = os.getenv('DATABASE_HOST', None)
 database_name = os.getenv('DATABASE_NAME')

@@ -77,10 +77,19 @@ def _generate_upsert_pgsql(mon_loc):
 
 
 class NoDb:
+    """
+    Do Nothing place holder no database available.
+    """
     def __enter__(self):
+        """
+        Do Nothing place holder.
+        """
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Do Nothing place holder.
+        """
         pass
 
 
