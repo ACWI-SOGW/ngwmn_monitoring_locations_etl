@@ -31,7 +31,6 @@ if __name__ == '__main__':
         raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
 
     mon_locs = get_monitoring_locations(registry_endpoint)
-    mon_locs = real_data
     failed_locations = []
     count = 1
 
