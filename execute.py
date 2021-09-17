@@ -35,7 +35,7 @@ if __name__ == '__main__':
     count = 1
 
     with make_oracle(database_host, database_port, database_name, database_user, database_password) as oracle, \
-            make_postgres(pg_host, database_name, database_user, database_password) as postgres:
+            make_postgres(pg_host, "5432", database_name, database_user, database_password) as postgres:
 
         for mon_loc in mon_locs:
             transformed_data = transform_mon_loc_data(mon_loc)
@@ -57,7 +57,10 @@ if __name__ == '__main__':
                 logging.info(f'Loaded monitoring locations: {count}')
             count = count + 1
 
+        logging.info(f'Loaded monitoring locations: {count}')
+
         if database_host is not None:
+            logging.info(f'updating Oracle materialized view')
             try:  # ETL to legacy Oracle
                 refresh_well_registry_mv(oracle)
                 oracle_update = True
@@ -65,6 +68,7 @@ if __name__ == '__main__':
                 oracle_update = False
 
         if pg_host is not None:
+            logging.info(f'updating postgres registry table')
             try:  # ETL to PostGIS
                 refresh_well_registry_pg(postgres)
                 postgres_update = True

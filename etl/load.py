@@ -76,12 +76,20 @@ def _generate_upsert_pgsql(mon_loc):
     return statement
 
 
+class NoDb:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
 def make_oracle(host, port, database, user, password):
     """
     Connect to Oracle database.
     """
     if host is None:
-        return None
+        return NoDb()
     connect_str = f'{host}:{port}/{database}'
     return cx_Oracle.connect(user, password, connect_str, encoding='UTF-8')
 
@@ -91,8 +99,8 @@ def make_postgres(host, port, database, user, password):
     Connect to Postgres database.
     """
     if host is None:
-        return None
-    return psycopg2.connect(host=host, port="5432", database=database, user=user, password=password)
+        return NoDb()
+    return psycopg2.connect(host=host, port=port, database=database, user=user, password=password)
 
 
 def load_monitoring_location(connect, mon_loc):
@@ -105,7 +113,7 @@ def load_monitoring_location(connect, mon_loc):
     connect.commit()
 
 
-def load_monitoring_location_pg(connect, db_host, db_name, db_user, db_password, mon_loc):
+def load_monitoring_location_pg(connect, mon_loc):
     """
     Connect to the database and run the upsert SQL into PostGIS.
     """
