@@ -5,7 +5,6 @@ Execute the ETL from the new well registry to NGWMN
 import logging
 import os
 import warnings
-from turtle import pos
 
 import cx_Oracle
 import psycopg2
@@ -31,7 +30,7 @@ if __name__ == '__main__':
     if database_user is None or database_password is None:
         raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
 
-    #    mon_locs = get_monitoring_locations(registry_endpoint)
+    mon_locs = get_monitoring_locations(registry_endpoint)
     mon_locs = real_data
     failed_locations = []
     count = 1
