@@ -57,6 +57,7 @@ if __name__ == '__main__':
 
             if count % 1000 == 1:
                 logging.info(f'Loaded monitoring locations: {count}')
+            count = count + 1
 
         if database_host is not None:
             try:  # ETL to legacy Oracle
