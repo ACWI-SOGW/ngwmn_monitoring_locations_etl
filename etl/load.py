@@ -76,58 +76,77 @@ def _generate_upsert_pgsql(mon_loc):
     return statement
 
 
-def load_monitoring_location(db_user, db_password, connect_str, mon_loc):
+class NoDb:
+    """
+    Do Nothing place holder no database available.
+    """
+    def __enter__(self):
+        """
+        Do Nothing place holder.
+        """
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Do Nothing place holder.
+        """
+        pass
+
+
+def make_oracle(host, port, database, user, password):
+    """
+    Connect to Oracle database.
+    """
+    if host is None:
+        return NoDb()
+    connect_str = f'{host}:{port}/{database}'
+    return cx_Oracle.connect(user, password, connect_str, encoding='UTF-8')
+
+
+def make_postgres(host, port, database, user, password):
+    """
+    Connect to Postgres database.
+    """
+    if host is None:
+        return NoDb()
+    return psycopg2.connect(host=host, port=port, database=database, user=user, password=password)
+
+
+def load_monitoring_location(connect, mon_loc):
     """
     Connect to the database and run the upsert SQL into Oracle.
 
     """
-    with cx_Oracle.connect(
-        db_user, db_password, connect_str, encoding='UTF-8'
-    ) as connect:
-        cursor = connect.cursor()
-        cursor.execute(_generate_upsert_sql(mon_loc))
-        connect.commit()
+    cursor = connect.cursor()
+    cursor.execute(_generate_upsert_sql(mon_loc))
+    connect.commit()
 
 
-def load_monitoring_location_pg(db_host, db_name, db_user, db_password, mon_loc):
+def load_monitoring_location_pg(connect, mon_loc):
     """
     Connect to the database and run the upsert SQL into PostGIS.
     """
-    with psycopg2.connect(
-            host=db_host,
-            port="5432",
-            database=db_name,
-            user=db_user,
-            password=db_password
-    ) as connect:
-        cursor = connect.cursor()
-        cursor.execute(_generate_upsert_pgsql(mon_loc))
-        connect.commit()
+    cursor = connect.cursor()
+    cursor.execute(_generate_upsert_pgsql(mon_loc))
+    connect.commit()
 
 
-def refresh_well_registry_mv(db_user, db_password, connect_str):
+def refresh_well_registry_mv(connect):
     """
     Refresh the well_registry_mv materialized view
     """
-    with cx_Oracle.connect(
-        db_user, db_password, connect_str, encoding='UTF-8'
-    ) as connect:
-        cursor = connect.cursor()
-        cursor.execute("begin dbms_mview.refresh('GW_DATA_PORTAL.WELL_REGISTRY_MV'); end;")
+    cursor = connect.cursor()
+    cursor.execute("begin dbms_mview.refresh('GW_DATA_PORTAL.WELL_REGISTRY_MV'); end;")
 
 
-def refresh_well_registry_pg(db_host, db_name, db_user, db_password):
-    with psycopg2.connect(
-            host=db_host,
-            port="5432",
-            database=db_name,
-            user=db_user,
-            password=db_password
-    ) as connect:
-        cursor = connect.cursor()
-        cursor.execute(DELETE_MV)
-        cursor.execute(INSERT_MV)
-        connect.commit()
+def refresh_well_registry_pg(connect):
+    """
+    Refresh the well_registry_mv table in postgres
+    """
+    cursor = connect.cursor()
+    cursor.execute(DELETE_MV)
+    cursor.execute(INSERT_MV)
+    connect.commit()
 
 
 DELETE_MV = 'delete from gw_data_portal.well_registry_mv;'
