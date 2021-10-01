@@ -22,6 +22,8 @@ database_port = os.getenv('DATABASE_PORT')
 database_user = os.getenv('DATABASE_USER')
 database_password = os.getenv('DATABASE_PASSWORD')
 pg_host = os.getenv('PG_HOST', None)
+pg_port = os.getenv('PG_DB_NAME', '5432')
+pg_db_name = os.getenv('PG_DB_NAME', 'ngwmn')
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
@@ -36,7 +38,7 @@ if __name__ == '__main__':
     count = 0
 
     with make_oracle(database_host, database_port, database_name, database_user, database_password) as oracle, \
-            make_postgres(pg_host, "5432", database_name, database_user, database_password) as postgres:
+            make_postgres(pg_host, pg_port, pg_db_name, database_user, database_password) as postgres:
 
         for mon_loc in mon_locs:
             transformed_data = transform_mon_loc_data(mon_loc)

@@ -6,6 +6,8 @@
 The following environment variables need to be provided to run the ETL:
 
 * PG_HOST: the hostname of the destination Postgres database
+* PG_PORT: optional database port, default 5432
+* PG_HOST: optional database name, default ngwmn
 * DATABASE_HOST: the hostname of the destination Oracle database
 * DATABASE_NAME: name of destination database
 * DATABASE_PORT: port that the Oracle database is listening on
