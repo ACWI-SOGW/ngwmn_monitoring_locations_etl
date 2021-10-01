@@ -4,6 +4,7 @@ Execute the ETL from the new well registry to NGWMN
 
 import logging
 import os
+import sys
 import warnings
 
 import cx_Oracle
@@ -27,10 +28,12 @@ if __name__ == '__main__':
 
     if database_user is None or database_password is None:
         raise AssertionError('DATABASE_USER and DATABASE_PASSWORD environment variables must be specified.')
+    if database_host is None and pg_host is None:
+        raise AssertionError('One or both DATABASE_HOST and/or PG_HOST environment variables must be specified.')
 
     mon_locs = get_monitoring_locations(registry_endpoint)
     failed_locations = []
-    count = 1
+    count = 0
 
     with make_oracle(database_host, database_port, database_name, database_user, database_password) as oracle, \
             make_postgres(pg_host, "5432", database_name, database_user, database_password) as postgres:
@@ -82,3 +85,4 @@ if __name__ == '__main__':
         if not postgres_update:
             warning_message += "\n Postgres Well_Registry_MV Not Updated.\n"
         warnings.warn(warning_message)
+        sys.exit(1)
