@@ -5,12 +5,17 @@
 
 The following environment variables need to be provided to run the ETL:
 
-*   DATABASE_HOST: the hostname of the destination Oracle database
-*   DATABASE_NAME: name of destination database
-*   DATABASE_PORT: port that the Oracle database is listening on
-*   DATABASE_USER: username used to connect
-*   DATABASE_PASSWORD: password used to connect
-*   REGISTRY_ML_ENDPOINT: the URL of the Well Registry endpoint from which new monitoring locations are pulled
+* PG_HOST: the hostname of the destination Postgres database
+* PG_PORT: optional database port, default 5432
+* PG_HOST: optional database name, default ngwmn
+* DATABASE_HOST: the hostname of the destination Oracle database
+* DATABASE_NAME: name of destination database
+* DATABASE_PORT: port that the Oracle database is listening on
+* DATABASE_USER: username used to connect
+* DATABASE_PASSWORD: password used to connect
+* REGISTRY_ML_ENDPOINT: the URL of the Well Registry endpoint from which new monitoring locations are pulled
+
+Of the two HOST env variables, only one is required while both can be set.
 
 Once the environment variables are specified, the ETL can be run
 by:

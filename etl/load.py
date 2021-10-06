@@ -66,7 +66,7 @@ def _generate_upsert_pgsql(mon_loc):
     all_columns = ','.join(col for (col, _) in mon_loc_db if col not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
     all_columns += ',geom'
     all_values = ','.join(value for (key, value) in mon_loc_db if key not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
-    all_values += f", ST_MakePoint({mon_loc['DEC_LAT_VA']},{mon_loc['DEC_LONG_VA']})"
+    all_values += f", ST_SetSRID(ST_MakePoint({mon_loc['DEC_LONG_VA']},{mon_loc['DEC_LAT_VA']}),4269)"
     update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO', 'INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
 
     statement = (
