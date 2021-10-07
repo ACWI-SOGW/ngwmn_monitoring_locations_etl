@@ -22,7 +22,7 @@ database_port = os.getenv('DATABASE_PORT')
 database_user = os.getenv('DATABASE_USER')
 database_password = os.getenv('DATABASE_PASSWORD')
 pg_host = os.getenv('PG_HOST', None)
-pg_port = os.getenv('PG_DB_NAME', '5432')
+pg_port = os.getenv('PG_PORT', '5432')
 pg_db_name = os.getenv('PG_DB_NAME', 'ngwmn')
 
 if __name__ == '__main__':
