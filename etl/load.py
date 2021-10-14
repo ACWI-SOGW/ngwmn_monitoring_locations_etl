@@ -63,17 +63,17 @@ def _generate_upsert_pgsql(mon_loc):
     Generate SQL to insert/update for PostGIS
     """
     mon_loc_db = [(k, _manipulate_values(v, k in TIME_COLUMNS)) for k, v in mon_loc.items()]
-    all_columns = ','.join(col for (col, _) in mon_loc_db if col not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
-    all_columns += ',geom'
+    all_columns = '"' + '","'.join(col for (col, _) in mon_loc_db if col not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
+    all_columns += '","GEOM"'
     all_values = ','.join(value for (key, value) in mon_loc_db if key not in ['INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
     geom_col = f" ST_SetSRID(ST_MakePoint({mon_loc['DEC_LONG_VA']},{mon_loc['DEC_LAT_VA']}),4269) "
     all_values += "," + geom_col
-    update_query = ','.join(f"{k}={v}" for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO', 'INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
-    update_query += ", geom=" + geom_col
+    update_query = ','.join(f'"{k}"={v}' for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO', 'INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
+    update_query += ', "GEOM"=' + geom_col
 
     statement = (
-        f"INSERT INTO GW_DATA_PORTAL.WELL_REGISTRY_MAIN ({all_columns}) VALUES ({all_values}) "
-        f"ON CONFLICT(agency_cd, site_no) DO UPDATE SET {update_query}"
+        f'INSERT INTO "GW_DATA_PORTAL"."WELL_REGISTRY_MAIN" ({all_columns}) VALUES ({all_values}) '
+        f'ON CONFLICT("AGENCY_CD", "SITE_NO") DO UPDATE SET {update_query}'
     )
     return statement
 
