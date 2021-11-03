@@ -10,7 +10,7 @@ import warnings
 import cx_Oracle
 import psycopg2
 
-from etl.extract import get_monitoring_locations
+from etl.extract import Extract
 from etl.transform import transform_mon_loc_data, date_format
 from etl.load import load_monitoring_location, load_monitoring_location_pg, \
     refresh_well_registry_mv, refresh_well_registry_pg, make_oracle, make_postgres
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     if database_host is None and pg_host is None:
         raise AssertionError('One or both DATABASE_HOST and/or PG_HOST environment variables must be specified.')
 
-    mon_locs = get_monitoring_locations(registry_endpoint)
+    mon_locs = Extract().get_monitoring_locations(registry_endpoint)
     failed_locations = []
     count = 0
 
