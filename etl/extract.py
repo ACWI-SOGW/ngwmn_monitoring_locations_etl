@@ -38,7 +38,7 @@ class Extract:
         next_chunk = self.construct_url(registry_ml_endpoint)
         results = []
 
-        with Session() as session:
+        with self.session() as session:
             while next_chunk:
                 fetches += 1
                 if fetches % self.FETCHES_PER_LOG == 0:
@@ -61,6 +61,14 @@ class Extract:
 
         logging.info(f'Finished retrieving {len(results)} monitoring locations.')
         return results
+
+    # noinspection PyMethodMayBeStatic
+    # pylint: disable=too-few-public-methods, no-member
+    def session(self):
+        """
+        Facilitates unit testing by allowing the override to return a mock
+        """
+        return Session()
 
     def fetch_record_block(self, url, session):
         attempt_count_net = 1
