@@ -20,6 +20,7 @@ class MockExtract(Extract):
     def __init__(self, mock_session):
         Extract.__init__(self)  # must call super constructor
         self.mock_session = mock_session
+        self.FETCH_RETRY_DELAY = 0
 
     def session(self):
         return self.mock_session
@@ -35,6 +36,8 @@ class MockResponse:
         """
         self.status_code = status_code
 
+    # noinspection PyMethodMayBeStatic
+    # pylint: disable=too-few-public-methods, no-member
     def json(self):
         return {'next': None, 'count': 2, 'results': ['dummyone', 'dummytwo']}
 
@@ -43,8 +46,6 @@ class TestGetMonitoringLocations(TestCase):
 
     def setUp(self):
         logging.getLogger().setLevel(level=logging.INFO)
-        self.extract = Extract()
-        self.extract.FETCH_RETRY_DELAY = 0
         self.fake_endpoint = 'https://fake.usgs.gov/registry/monitoring-locations/'
         self.mock_json_payload = {'good': 'json'}
         self.mock_json_good = '{"good":"json"}'
@@ -54,13 +55,14 @@ class TestGetMonitoringLocations(TestCase):
         when(self.mock_session).__enter__().thenReturn(self.mock_session)
         when(self.mock_session).__exit__(*mockito.args)
         print()  # to separate the log blocks per test
+        self.extract = MockExtract(self.mock_session)
 
         # to be called for testing get_monitoring_locations because it uses a with-block
         # mockito.verifyStubbedInvocationsAreUsed()
 
     @mock.patch.object(Session, 'get', return_value=MockResponse(200))
     def test_get_data(self, _):
-        self.assertEqual(self.extract.get_monitoring_locations(self.fake_endpoint), ['dummyone', 'dummytwo'])
+        self.assertEqual(Extract().get_monitoring_locations(self.fake_endpoint), ['dummyone', 'dummytwo'])
 
     @mock.patch('requests.session')
     def testing_mocking_session(self, mock_session):
@@ -103,26 +105,38 @@ class TestGetMonitoringLocations(TestCase):
         self.assertEqual(200, response1.status_code)
         self.assertEqual(204, response2.status_code)
 
+    def test_construct_url(self):
+        url = self.extract.construct_url(self.fake_endpoint)
+        self.assertEqual(self.fake_endpoint + '?limit=8&offset=0', url)
+        url = self.extract.construct_url(url)
+        self.assertEqual(self.fake_endpoint + '?limit=8&offset=8', url)
+        url = self.extract.construct_url(url)
+        self.assertEqual(self.fake_endpoint + '?limit=8&offset=16', url)
+        for i in range(14):
+            url = self.extract.construct_url(url)
+        self.assertEqual(self.fake_endpoint + '?limit=8&offset=128', url)
+
     def test_get_monitoring_locations_3_success(self):
         # with mock.patch.object(Session, 'get', return_value=self.MockResponse(200)):
         #     pass
+        fake_first_url = self.fake_endpoint + '?limit=8&offset=0'
 
         mock_response_a = mocki({'text': self.mock_json_good, 'status_code': 200}, spec=Response)
         mock_payload_a = copy.deepcopy(self.mock_payload)
-        mock_payload_a['next'] = self.fake_endpoint + '?limit=8&2'
+        mock_payload_a['next'] = self.fake_endpoint + '?limit=8&offset=8'
         when(mock_response_a).json().thenReturn(mock_payload_a)
 
         mock_response_b = mocki({'text': self.mock_json_good, 'status_code': 200}, spec=Response)
         mock_payload_b = copy.deepcopy(self.mock_payload)
-        mock_payload_b['next'] = self.fake_endpoint + '?limit=8&3'
+        mock_payload_b['next'] = self.fake_endpoint + '?limit=8&offset=16'
         when(mock_response_b).json().thenReturn(mock_payload_b)
 
         mock_response_c = mocki({'text': self.mock_json_good, 'status_code': 200}, spec=Response)
         mock_payload_c = copy.deepcopy(self.mock_payload)
-        mock_payload_c['next'] = None
+        # mock_payload_c['next'] = None  # this is the mock default value. It requires setting if the default changes.
         when(mock_response_c).json().thenReturn(mock_payload_c)
 
-        when(self.mock_session).get(self.fake_endpoint + '?limit=8').thenReturn(mock_response_a)
+        when(self.mock_session).get(fake_first_url).thenReturn(mock_response_a)
         when(self.mock_session).get(mock_payload_a['next']).thenReturn(mock_response_b)
         when(self.mock_session).get(mock_payload_b['next']).thenReturn(mock_response_c)
 
@@ -130,12 +144,46 @@ class TestGetMonitoringLocations(TestCase):
         records = extract.get_monitoring_locations(self.fake_endpoint)
         # the base URL is not called in this test. Extract.construct_url() adds the fetch limit in lieu of the default.
         mockito.verify(self.mock_session, times=0).get(self.fake_endpoint)
-        # each of the batch request URLs is called once.
+        # each of the batch request URLs is called once. One is the default but I like explicit indication.
         mockito.verify(self.mock_session, times=1).get(extract.construct_url(self.fake_endpoint))
         mockito.verify(self.mock_session, times=1).get(mock_payload_a['next'])
         mockito.verify(self.mock_session, times=1).get(mock_payload_b['next'])
 
         self.assertEqual(3, len(records), 'there should be three mock records returned')
+
+    def test_get_monitoring_locations_3_success_with_json_parse_error(self):
+        fake_first_url = self.fake_endpoint + '?limit=8&offset=0'
+
+        mock_response_a = mocki({'text': self.mock_json_good, 'status_code': 200}, spec=Response)
+        mock_payload_a = copy.deepcopy(self.mock_payload)
+        mock_payload_a['next'] = self.fake_endpoint + '?limit=8&offset=8'
+        when(mock_response_a).json().thenReturn(mock_payload_a)
+
+        mock_response_b = mocki({'text': self.mock_json_good, 'status_code': 200}, spec=Response)
+        mock_payload_b = copy.deepcopy(self.mock_payload)
+        mock_payload_b['next'] = self.fake_endpoint + '?limit=8&offset=16'
+        when(mock_response_b).json().thenRaise(JSONDecodeError('Bad JSON', 'Bad DOC', 0))
+
+        mock_response_c = mocki({'text': self.mock_json_good, 'status_code': 200}, spec=Response)
+        mock_payload_c = copy.deepcopy(self.mock_payload)
+        # mock_payload_c['next'] = None  # this is the mock default value. It requires setting if the default changes.
+        when(mock_response_c).json().thenReturn(mock_payload_c)
+
+        when(self.mock_session).get(fake_first_url).thenReturn(mock_response_a)
+        when(self.mock_session).get(mock_payload_a['next']).thenReturn(mock_response_b)
+        when(self.mock_session).get(mock_payload_b['next']).thenReturn(mock_response_c)
+
+        extract = MockExtract(self.mock_session)
+        records = extract.get_monitoring_locations(self.fake_endpoint)
+        # the base URL is not called in this test. Extract.construct_url() adds the fetch limit in lieu of the default.
+        mockito.verify(self.mock_session, times=0).get(self.fake_endpoint)
+        # each of the batch request URLs is called once. One is the default but I like explicit indication.
+        mockito.verify(self.mock_session, times=1).get(extract.construct_url(self.fake_endpoint))
+        # this one will fail by mock conditions after called twice
+        mockito.verify(self.mock_session, times=2).get(mock_payload_a['next'])
+        mockito.verify(self.mock_session, times=1).get(mock_payload_b['next'])
+
+        self.assertEqual(2, len(records), 'there should be two mock records returned because of the middle fail')
 
     def test_fetch_record_block_2_bad_json(self):
         # ensure that the retries works and that if the JSON is bad that it only tries TWICE

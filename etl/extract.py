@@ -35,29 +35,31 @@ class Extract:
         # initialize state of errors, URL, and results
         json_fail_count = 0
         fetches = 0
-        next_chunk = self.construct_url(registry_ml_endpoint)
+        url = self.construct_url(registry_ml_endpoint)
         results = []
 
         with self.session() as session:
-            while next_chunk:
-                fetches += 1
+            while url:
                 if fetches % self.FETCHES_PER_LOG == 0:
-                    logging.info(f'Retrieving monitoring locations: {next_chunk}')
+                    logging.info(f'Retrieving monitoring locations: {url}')
                 try:
-                    payload = self.fetch_record_block(next_chunk, session)
+                    fetches += 1
+                    payload = self.fetch_record_block(url, session)
                     results.extend(payload.get('results'))
-                    next_chunk = payload.get('next')
+                    if payload.get('next') is None or payload.get('next') == '':
+                        break
                 except JSONDecodeError as json_err:
                     json_fail_count += 1
-                    if json_fail_count > self.FETCH_JSON_ERROR_TOLERANCE:
+                    if json_fail_count >= self.FETCH_JSON_ERROR_TOLERANCE:
                         logging.error('Abort: JSON errors exceeded. Set FETCH_JSON_ERROR_TOLERANCE to fine tune.')
                         raise JSONDecodeError('JSON errors exceeded.', json_err.doc, json_err.pos)
                     else:
                         logging.warning(
                             f'JSON error occurred, {self.FETCH_JSON_ERROR_TOLERANCE-json_fail_count} before abort.')
                 except RequestException:
-                    logging.error(f'Unrecoverable error fetching data from {next_chunk}')
+                    logging.error(f'Unrecoverable error fetching data from {url}')
                     return []
+                url = self.construct_url(url)
 
         logging.info(f'Finished retrieving {len(results)} monitoring locations.')
         return results
@@ -160,5 +162,17 @@ class Extract:
             else:
                 url += '&'
             url += 'limit=' + str(self.FETCH_LIMIT)
+
+        offset = 'offset'
+        if offset in url:
+            start = url.index(offset) + len(offset) + 1
+            try:
+                end = url.index('&', start)
+            except ValueError:
+                end = len(url)
+            offset_num = int(url[start:end]) + self.FETCH_LIMIT
+            url = url[:start] + str(offset_num) + url[end:len(url)]
+        else:
+            url += '&offset=0'
 
         return url
