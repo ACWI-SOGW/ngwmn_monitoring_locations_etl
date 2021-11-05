@@ -17,7 +17,13 @@ from ..extract import Extract
 
 
 class MockExtract(Extract):
+    """
+    Mocks the Extract for IoC of mocked entities.
+    """
     def __init__(self, mock_session):
+        """
+        Initialize MockExtract.
+        """
         Extract.__init__(self)  # must call super constructor
         self.mock_session = mock_session
         self.FETCH_RETRY_DELAY = 0
@@ -28,11 +34,11 @@ class MockExtract(Extract):
 
 class MockResponse:
     """
-    Mocks the requests get response
+    Mocks the requests get response.
     """
     def __init__(self, status_code):
         """
-        Initialize MockResponse
+        Initialize MockResponse.
         """
         self.status_code = status_code
 
@@ -193,7 +199,7 @@ class TestGetMonitoringLocations(TestCase):
         when(self.mock_session).get(self.fake_endpoint).thenReturn(mock_response_a)
         when(mock_response_a).json().thenRaise(JSONDecodeError('', '', 0))
 
-        self.assertRaises(JSONDecodeError, 
+        self.assertRaises(JSONDecodeError,
                           lambda: self.extract.fetch_record_block(self.fake_endpoint, self.mock_session))
         mockito.verify(self.mock_session, times=self.extract.FETCH_TRIES_FOR_JSON).get(self.fake_endpoint)
 
@@ -206,7 +212,7 @@ class TestGetMonitoringLocations(TestCase):
         when(mock_response_a).json().thenRaise(JSONDecodeError('', '', 0))
 
         self.extract.FETCH_TRIES_FOR_JSON = 3
-        self.assertRaises(JSONDecodeError, 
+        self.assertRaises(JSONDecodeError,
                           lambda: self.extract.fetch_record_block(self.fake_endpoint, self.mock_session))
         mockito.verify(self.mock_session, times=self.extract.FETCH_TRIES_FOR_JSON).get(self.fake_endpoint)
 
@@ -250,7 +256,7 @@ class TestGetMonitoringLocations(TestCase):
         when(mock_response_a).json().thenRaise(JSONDecodeError("shouldn't call this", 'place holder', 0))
 
         # the HTTPError is captured by the tries and reported as a the parent RequestException indicating non-json error
-        self.assertRaises(RequestException, 
+        self.assertRaises(RequestException,
                           lambda: self.extract.fetch_record_block(self.fake_endpoint, self.mock_session))
         mockito.verify(self.mock_session, times=self.extract.FETCH_TRIES_FOR_STATUS_CODE).get(self.fake_endpoint)
 
@@ -265,7 +271,7 @@ class TestGetMonitoringLocations(TestCase):
 
         self.extract.FETCH_TRIES_FOR_STATUS_CODE = 3
         # the HTTPError is captured by the tries and reported as a the parent RequestException indicating non-json error
-        self.assertRaises(RequestException, 
+        self.assertRaises(RequestException,
                           lambda: self.extract.fetch_record_block(self.fake_endpoint, self.mock_session))
         mockito.verify(self.mock_session, times=self.extract.FETCH_TRIES_FOR_STATUS_CODE).get(self.fake_endpoint)
 
@@ -290,7 +296,7 @@ class TestGetMonitoringLocations(TestCase):
         mock_response_a = mocki({'text': 'bad JSON once', 'status_code': 200}, spec=Response)
         when(self.mock_session).get(self.fake_endpoint).thenRaise(RequestException(response=mock_response_a))\
 
-        self.assertRaises(RequestException, 
+        self.assertRaises(RequestException,
                           lambda: self.extract.fetch_record_block(self.fake_endpoint, self.mock_session))
         mockito.verify(self.mock_session, times=self.extract.FETCH_TRIES_FOR_NETWORK_ERROR).get(self.fake_endpoint)
 
@@ -302,7 +308,7 @@ class TestGetMonitoringLocations(TestCase):
         when(self.mock_session).get(self.fake_endpoint).thenRaise(RequestException(response=mock_response_a))\
 
         self.extract.FETCH_TRIES_FOR_NETWORK_ERROR = 3
-        self.assertRaises(RequestException, 
+        self.assertRaises(RequestException,
                           lambda: self.extract.fetch_record_block(self.fake_endpoint, self.mock_session))
         mockito.verify(self.mock_session, times=self.extract.FETCH_TRIES_FOR_NETWORK_ERROR).get(self.fake_endpoint)
 

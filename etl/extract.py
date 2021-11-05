@@ -13,19 +13,19 @@ from requests.exceptions import HTTPError
 
 class Extract:
     def __init__(self):
-        """Number of records to fetch in at once"""
+        """Number of records to fetch in at once."""
         self.FETCH_LIMIT = 8
-        """Number of times to retry when there is a network error"""
+        """Number of times to retry when there is a network error."""
         self.FETCH_TRIES_FOR_NETWORK_ERROR = 2
-        """Number of times to retry when there is an HTTP Status code other than ok"""
+        """Number of times to retry when there is an HTTP Status code other than ok."""
         self.FETCH_TRIES_FOR_STATUS_CODE = 2
-        """Number of times to retry when there is the JSON fails to decode"""
+        """Number of times to retry when there is the JSON fails to decode."""
         self.FETCH_TRIES_FOR_JSON = 2
-        """Number of times to accept a missing data for aborting the ETL"""
+        """Number of times to accept a missing data for aborting the ETL."""
         self.FETCH_JSON_ERROR_TOLERANCE = 2
-        """Number of seconds to wait before a retry is attempted"""
+        """Number of seconds to wait before a retry is attempted."""
         self.FETCH_RETRY_DELAY = 10
-        """Number of fetches per info log"""
+        """Number of fetches per info log."""
         self.FETCHES_PER_LOG = 128
 
     def get_monitoring_locations(self, registry_ml_endpoint):
@@ -65,10 +65,11 @@ class Extract:
         return results
 
     # noinspection PyMethodMayBeStatic
-    # pylint: disable=too-few-public-methods, no-member
+    # pylint: disable=no-self-use
     def session(self):
         """
-        Facilitates unit testing by allowing the override to return a mock
+        Helper method that facilitates IoC.
+        Self-Use warning is disabled because an instance method is required to perform IoC.
         """
         return Session()
 
@@ -118,7 +119,7 @@ class Extract:
 
         if attempt_count_net > self.FETCH_TRIES_FOR_NETWORK_ERROR \
                 or attempt_count_status > self.FETCH_TRIES_FOR_STATUS_CODE:
-            logging.warning(f'Retrying failed')
+            logging.warning('Retrying failed')
             raise RequestException()
 
         if payload is None:  # ideally we should not raise this exception
@@ -126,7 +127,7 @@ class Extract:
 
         # if this is a retry then pause for a delay to see if it recovers
         if attempt_count_net + attempt_count_status + attempt_count_json > 3:
-            logging.info(f'Retrying succeeded')
+            logging.info('Retrying succeeded')
 
         return payload
 
@@ -152,7 +153,7 @@ class Extract:
 
     def construct_url(self, endpoint):
         """
-        Construct the URL with a smaller limit than the 1024 default
+        Construct the URL with a smaller limit than the 1024 default.
         """
         url = endpoint
 
