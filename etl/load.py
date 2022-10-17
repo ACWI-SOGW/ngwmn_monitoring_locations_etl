@@ -71,6 +71,8 @@ def _generate_upsert_pgsql(mon_loc):
     update_query = ','.join(f'"{k}"={v}' for (k, v) in mon_loc_db if k not in ['AGENCY_CD', 'SITE_NO', 'INSERT_USER_ID', 'UPDATE_USER_ID', 'REVIEW_FLAG'])
     update_query += ', "GEOM"=' + geom_col
 
+    print(f'The update query looks like this: {update_query}')
+
     statement = (
         f'INSERT INTO "GW_DATA_PORTAL"."WELL_REGISTRY_MAIN" ({all_columns}) VALUES ({all_values}) '
         f'ON CONFLICT("AGENCY_CD", "SITE_NO") DO UPDATE SET {update_query}'
